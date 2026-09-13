@@ -10,9 +10,14 @@ services:
     restart: unless-stopped
     expose:
       - "8888"
+    environment:
+      # Upstream storage reads the live database path from this variable and
+      # auto-creates the schema when the file is empty (no seed image needed).
+      NANAON_DB_PATH: /opt/nanaon/Nanaon-Private-Server/data/private_server.sqlite3
+      NANAON_RESOURCE_ROOT: /opt/nanaon
     volumes:
       - ./config.cloudflare.yaml:/opt/nanaon/Nanaon-Private-Server/config.cloudflare.yaml:ro
-      # Live database stays on the host; the image only ships a seed copy.
+      # Live database stays on the host; storage initializes an empty file.
       - ../var/db/private_server.sqlite3:/opt/nanaon/Nanaon-Private-Server/data/private_server.sqlite3
       - ../var:/opt/nanaon/Nanaon-Private-Server/var:rw
       - ../compat_assets:/opt/nanaon/Nanaon-Private-Server/compat_assets:ro

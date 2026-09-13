@@ -13,15 +13,12 @@ COPY api ./api
 COPY cdn ./cdn
 COPY crypto ./crypto
 COPY data ./data
-COPY process_guard.py server.py ./
+COPY server.py ./
+COPY deploy/serve.py ./serve.py
 
-# The tracked data/private_server.sqlite3 is a seed only; the live database is
-# bind-mounted over data/private_server.sqlite3 at runtime (see compose.yaml).
-RUN mv data/private_server.sqlite3 seed.sqlite3 && \
-    mkdir -p var/logs var/run compat_assets data
+RUN mkdir -p var/logs var/run compat_assets data
 
-COPY deploy/entrypoint.sh /usr/local/bin/nanaon-entrypoint.sh
-RUN chmod +x /usr/local/bin/nanaon-entrypoint.sh
-
-ENTRYPOINT ["nanaon-entrypoint.sh"]
-CMD ["--config", "config.cloudflare.yaml", "--host", "0.0.0.0", "--port", "8888"]
+# serve.py pins the asset roots to the mounted resource trees and serves the
+# app with waitress; the live database location comes from NANAON_DB_PATH
+# (see compose.yaml). Upstream's server.py is a library without __main__.
+ENTRYPOINT ["python", "serve.py"]

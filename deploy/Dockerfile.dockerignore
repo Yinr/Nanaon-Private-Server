@@ -6,8 +6,7 @@
 !cdn
 !crypto
 !data
-!process_guard.py
 !server.py
 !deploy
 deploy/*
-!deploy/entrypoint.sh
+!deploy/serve.py
