@@ -1,0 +1,62 @@
+name: nanaon-private-server
+
+services:
+  nanaon-app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: nanaon-private-server:local
+    container_name: nanaon-app
+    restart: unless-stopped
+    expose:
+      - "8888"
+    volumes:
+      - ./config.cloudflare.yaml:/opt/nanaon/Nanaon-Private-Server/config.cloudflare.yaml:ro
+      # Live database stays on the host; the image only ships a seed copy.
+      - ../var/db/private_server.sqlite3:/opt/nanaon/Nanaon-Private-Server/data/private_server.sqlite3
+      - ../var:/opt/nanaon/Nanaon-Private-Server/var:rw
+      - ../compat_assets:/opt/nanaon/Nanaon-Private-Server/compat_assets:ro
+      - ../../main.5465.com.aniplex.nananiji:/opt/nanaon/main.5465.com.aniplex.nananiji:ro
+      - ../../com.aniplex.nananiji:/opt/nanaon/com.aniplex.nananiji:ro
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://127.0.0.1:8888/health', timeout=3)
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - nanaon
+
+  nanaon-caddy:
+    image: caddy:2-alpine
+    container_name: nanaon-caddy
+    restart: unless-stopped
+    depends_on:
+      nanaon-app:
+        condition: service_healthy
+    ports:
+      - "443:443"
+      # Publish 80:80 only when using the Let's Encrypt HTTP-01 challenge.
+      # - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./secrets:/etc/caddy/certs:ro
+      - ./site:/srv/www:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - nanaon
+
+networks:
+  nanaon:
+    name: nanaon_private
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,3 @@
+# TLS material and download artifacts stay out of source control.
+secrets/
+site/downloads/

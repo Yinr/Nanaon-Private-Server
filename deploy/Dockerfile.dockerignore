@@ -1,0 +1,13 @@
+# Build context for deploy/Dockerfile only (BuildKit per-Dockerfile ignore).
+# Whitelist style: exclude everything, then re-include what the COPY steps need.
+*
+!requirements.txt
+!api
+!cdn
+!crypto
+!data
+!process_guard.py
+!server.py
+!deploy
+deploy/*
+!deploy/entrypoint.sh

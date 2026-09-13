@@ -1,0 +1,182 @@
+.bgm-float {
+  --bgm-accent: var(--accent, #347de5);
+  --bgm-accent-dark: var(--accent-dark, #1d58af);
+  --bgm-ink: var(--ink, #202536);
+  --bgm-muted: var(--muted, #596275);
+  --bgm-default-cover: url("https://0000227.xyz/img/other/icon_group_total_strength.png");
+  position: fixed;
+  z-index: 4;
+  right: 22px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(270px, calc(100vw - 32px));
+  padding: 6px 9px 6px 6px;
+  background: rgba(255, 255, 255, .94);
+  border: 1px solid #cbd8eb;
+  border-radius: 999px;
+  box-shadow: 0 8px 22px rgba(35, 67, 112, .2);
+  backdrop-filter: blur(8px);
+}
+
+.bgm-disc-control {
+  position: relative;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--bgm-default-cover) center / cover no-repeat;
+}
+
+.bgm-cover {
+  position: absolute;
+  inset: 0;
+  display: none;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.bgm-float.has-track .bgm-cover:not([hidden]) {
+  display: block;
+  animation: bgm-cover-spin 8s linear infinite;
+  animation-play-state: paused;
+}
+
+.bgm-float.is-playing .bgm-cover:not([hidden]) {
+  animation-play-state: running;
+}
+
+.bgm-toggle {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 1px solid var(--bgm-accent);
+  border-radius: 50%;
+  background: var(--bgm-accent);
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition: background-color .25s ease, border-color .25s ease, color .25s ease;
+}
+
+.bgm-toggle [data-bgm-icon] {
+  text-shadow: 0 0 2px rgba(255, 255, 255, .95), 0 1px 4px rgba(255, 255, 255, .9);
+}
+
+.bgm-float:not(.has-track) .bgm-toggle {
+  border-color: transparent;
+  background: transparent;
+  color: var(--bgm-accent-dark);
+}
+
+.bgm-float:not(.has-track) .bgm-toggle:hover,
+.bgm-float:not(.has-track) .bgm-toggle:focus-visible {
+  border-color: transparent;
+  background: transparent;
+}
+
+.bgm-float.has-track .bgm-toggle {
+  border-color: transparent;
+  background: transparent;
+  color: transparent;
+}
+
+.bgm-float.has-track .bgm-toggle [data-bgm-icon] {
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+
+.bgm-float.has-track .bgm-toggle:hover,
+.bgm-float.has-track .bgm-toggle:focus-visible {
+  border-color: rgba(255, 255, 255, .84);
+  background: rgba(255, 255, 255, .78);
+  color: var(--bgm-accent-dark);
+}
+
+.bgm-float.has-track .bgm-toggle:hover [data-bgm-icon],
+.bgm-float.has-track .bgm-toggle:focus-visible [data-bgm-icon] {
+  opacity: 1;
+}
+
+.bgm-toggle:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.bgm-status {
+  display: none;
+  min-width: 0;
+  max-width: 164px;
+  color: var(--bgm-muted);
+  font-size: .76rem;
+  line-height: 1.25;
+}
+
+.bgm-float.has-track .bgm-status { display: block; }
+
+.bgm-title-viewport {
+  display: block;
+  max-width: 164px;
+  overflow: hidden;
+}
+
+.bgm-track-name {
+  display: inline-block;
+  width: max-content;
+  color: var(--bgm-ink);
+  font-size: .76rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.bgm-track-name:hover {
+  color: var(--bgm-accent-dark);
+}
+
+.bgm-track-name:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid rgba(52, 125, 229, .55);
+  outline-offset: 2px;
+}
+
+.bgm-track-name.is-scrolling {
+  animation: bgm-title-pan var(--bgm-scroll-duration, 12s) ease-in-out infinite;
+}
+
+.bgm-state {
+  display: block;
+  color: var(--bgm-muted);
+  font-size: .7rem;
+}
+
+@keyframes bgm-cover-spin {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bgm-title-pan {
+  0%, 23% { transform: translateX(0); }
+  50%, 73% { transform: translateX(calc(-1 * var(--bgm-scroll-distance))); }
+  100% { transform: translateX(0); }
+}
+
+@media (max-width: 600px) {
+  .bgm-float { right: 12px; bottom: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bgm-float.has-track .bgm-cover:not([hidden]),
+  .bgm-track-name.is-scrolling { animation: none; }
+}

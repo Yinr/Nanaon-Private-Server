@@ -1,0 +1,19 @@
+host: "0.0.0.0"
+port: 8888
+debug: false
+log_level: "INFO"
+max_request_size: 10485760
+
+crypto:
+  aes_key: "6471564271364c506b634e487944483543735845354e3548554d4d7643744552"
+  aes_iv: ""
+
+game:
+  api_url: "https://nanaon.0000227.xyz"
+  asset_url: "https://nanaon.0000227.xyz"
+  environment: "private"
+  asset_hash: "52501a157136111ea47b76da71be1aa5"
+  asset_version: 1652074651
+  playable_minimal_cards: false
+
+environment: "private"

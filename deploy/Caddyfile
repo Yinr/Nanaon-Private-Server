@@ -1,0 +1,48 @@
+nanaon.0000227.xyz {
+	tls /etc/caddy/certs/nanaon-origin.crt /etc/caddy/certs/nanaon-origin.key
+	# Keep diagnostics off the public origin.
+	@private path /admin*
+	respond @private 404
+
+	# Static client download page and release files.
+	@install_files path /downloads/*.apk /downloads/*.xapk /downloads/*.obb /downloads/SHA256SUMS.txt
+	handle @install_files {
+		root * /srv/www
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+	@downloads_root path /downloads /downloads/
+	redir @downloads_root / 302
+	@site_assets path /bgm.js /bgm.css
+	handle @site_assets {
+		root * /srv/www
+		header Cache-Control "no-cache"
+		file_server
+	}
+	@site path /
+	handle @site {
+		root * /srv/www
+		header Cache-Control "no-cache"
+		file_server
+	}
+
+	# API responses are per-user and must never be cached at the edge.
+	@api path /api* /Prod*
+	handle @api {
+		header Cache-Control "no-store"
+		reverse_proxy nanaon-app:8888 {
+			header_down -Cache-Control
+		}
+	}
+
+	# Resource URLs are content-addressed/versioned and can be cached safely.
+	@assets path /assets/* /android/* /Android/*
+	handle @assets {
+		header Cache-Control "public, max-age=31536000, immutable"
+		reverse_proxy nanaon-app:8888 {
+			header_down -Cache-Control
+		}
+	}
+
+	reverse_proxy nanaon-app:8888
+}
