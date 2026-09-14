@@ -1,0 +1,23 @@
+.env
+*.apk
+*.aab
+*.idsig
+*.keystore
+*.jks
+*.pem
+*.key
+*.crt
+*.cer
+*.csr
+*.log
+work/
+build/
+tmp/
+versions/*/.env
+versions/*/work/
+versions/*/build/
+__pycache__/
+*.py[cod]
+
+# Retired variant archives stay on disk only, not in git.
+archive/

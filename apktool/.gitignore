@@ -1,0 +1,3 @@
+# Local build and capture workspaces for the APK patch pipeline.
+work/
+release.keystore
