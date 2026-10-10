@@ -1,8 +1,8 @@
 # deploy/ — 生产部署（Cloudflare → Caddy → app）
 
-本目录是公网生产拓扑的全部定义，对上游文件**零修改**。上游 18e4b9f 起改为
-standalone LAN server（`lan_launcher.py` 交互式入口、无自带容器方案），本目录
-在不动上游文件的前提下为容器化生产部署提供自己的入口与编排。
+本目录是公网生产拓扑的全部定义，对上游文件**零修改**。上游不提供容器化部署方案
+（`lan_launcher.py` 与 `cloud_launcher.py` 均为交互式入口），本目录在不动上游文件
+的前提下为容器化生产部署提供自己的入口与编排。已适配过的上游提交见文末时间线。
 
 ## 拓扑
 
@@ -22,7 +22,7 @@ standalone LAN server（`lan_launcher.py` 交互式入口、无自带容器方�
 `create_app` 在 API 进程内注册资产蓝图，因此应用容器只需要开放
 8888 一个端口；Caddy 把 `/api*`、`/assets/*`、`/Android/*` 全部反代到它。
 
-## 运行模型（适配上游 18e4b9f）
+## 运行模型
 
 - `deploy/serve.py`：容器入口（新文件）。上游 `server.py` 是纯库
   （`create_app`/`load_config`，无 `__main__`），serve.py 用 waitress 起服务，
@@ -67,3 +67,10 @@ server.py deploy/serve.py`，不含下载大文件与 compat_assets（后者运�
 - `README-cloudflare.md`、`nginx.conf.example`：Cloudflare 接入与 Nginx 备选；
 - 2026-09-13：活库自旧 `data/` 布局迁移到 `var/db/`；同日适配上游
   standalone-server 重构（serve.py + NANAON_DB_PATH，取消种子机制）。
+- 2026-10-10：跟随上游 `ccb1631`（云端账号与本地资源分离、抽卡主数据回填，共 144
+  卡池）。部署定义无需改动——`compose.yaml`/`Caddyfile`/`Dockerfile`/
+  `config.cloudflare.yaml` 全部原样；实测已有库再启动 0.05s、`master_lottery_items`
+  稳定 7480 行不增长。`cloud_launcher.py` 位于仓库根目录，不在
+  `Dockerfile.dockerignore` 白名单内，因此镜像不含云端模式入口；
+  `CLOUD_IDENTITY` 仅由该入口装配，本站 `config.cloudflare.yaml` 不进云端模式，
+  不会被新鉴权门禁拦为 401。
