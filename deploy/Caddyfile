@@ -36,11 +36,15 @@ nanaon.0000227.xyz {
 	}
 
 	# Resource URLs are content-addressed/versioned and can be cached safely.
+	# Only successful responses may carry the long immutable TTL. A 404 must stay
+	# uncacheable: otherwise the edge pins a missing asset for a year, and after
+	# the asset is added the client still lands on the stale 404 on a random PoP.
 	@assets path /assets/* /android/* /Android/*
 	handle @assets {
-		header Cache-Control "public, max-age=31536000, immutable"
 		reverse_proxy nanaon-app:8888 {
 			header_down -Cache-Control
+			@cached status 200 206
+			header_down @cached Cache-Control "public, max-age=31536000, immutable"
 		}
 	}
 
